@@ -34,12 +34,38 @@ Coming Soon
 
 ## Configuring Policies
 
-- `title` (optional) - This is a user-readable name for the Safeguard policy. When the policy check is run in the CLI, the Safeguard policy name is used in the output.
-- `description` (optional) - The description should explain the intent of the policy. When the Safeguard policy check runs in the CLI this description will be displayed if the policy check fails. It is recommended that the description provides instructions on how to resolve an issue if the service is not compliant with the policy.
-- `safeguard` (requried) - Select the Safeguard you want to enforce.
-- `enforcementLevel` (optional, default: `error`) - The enforcement level can be set to either `warning` or `error`. When the Safeguard policy check runs in the CLI and the policy check passes, then enforcement level will have no impact on the deployment. However, if the policy check fails, then the enforcement level will control if the deployment can continue. If the enforcement level is set to `warning`, then the CLI will return a warning message but the deployment will continue. If the enforcement level is set to `error`, then the CLI will return an error message and the deployment will be blocked from continuing.
-- `config` - Some safeguards may allow or require configurations. For example, the [Allowed Runtimes (allowed-runtimes)](#allowed-runtimes) Safeguard requires a list of allowed AWS Lambda Runtimes for functions. This field allows you to customize the settings for the Safeguard policy.
-- `path` (optional) - If using a custom policy, this references the relative path to the safeguard base directory. 
+Safeguard policies are defined as an array in the `serverless.yml` in the `custom.safeguards` field. You can add multiple policies, and you can use the same safeguard multiple times. 
+
+```yaml
+custom:
+  safeguards:
+    - safeguard:
+      title:
+      description:
+      enforcementLevel:
+      config:
+```
+
+### Fields
+
+#### `title` (optional)
+
+This is a user-readable name for the Safeguard policy. When the policy check is run in the CLI, the Safeguard policy name is used in the output.
+
+#### `description` (optional)
+The description should explain the intent of the policy. When the Safeguard policy check runs in the CLI this description will be displayed if the policy check fails. It is recommended that the description provides instructions on how to resolve an issue if the service is not compliant with the policy.
+
+#### `safeguard` (required)
+The Safeguard ID. There are [over a dozen safeguards made availabe with the plugin](#safeguards-available-with-plugin). Each plugin has an `ID` (e.g. `allowed-runtimes`) which is used to reference in the policy. 
+
+#### `enforcementLevel` (optional, default: `error`)
+The enforcement level can be set to either `warning` or `error`. When the Safeguard policy check runs in the CLI and the policy check passes, then enforcement level will have no impact on the deployment. However, if the policy check fails, then the enforcement level will control if the deployment can continue. If the enforcement level is set to `warning`, then the CLI will return a warning message but the deployment will continue. If the enforcement level is set to `error`, then the CLI will return an error message and the deployment will be blocked from continuing.
+
+#### `config`
+Some safeguards may allow or require configurations. For example, the [Allowed Runtimes (allowed-runtimes)](#allowed-runtimes) Safeguard requires a list of allowed AWS Lambda Runtimes for functions. This field allows you to customize the settings for the Safeguard policy.
+
+#### `path` (optional)
+If using a custom policy, this references the relative path to the safeguard base directory.
 
 
 ## Usage
@@ -92,7 +118,7 @@ If one or more of the policy checks fail the command will return a 1 exit code s
 it can be detected from a script or CI/CD service.
 
 
-# Policies
+# Safeguards available with plugin
 
 The following policies are included and configurable in the [Serverless
 Framework Dashboard](https://app.serverless.com/).
