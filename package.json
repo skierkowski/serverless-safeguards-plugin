@@ -1,0 +1,15 @@
+{
+  "name": "serverless-safeguards",
+  "version": "1.0.0",
+  "description": "Serverless Framework Plugin for Safeguards",
+  "main": "index.js",
+  "repository": "https://github.com/skierkowski/serverless-safeguards",
+  "author": "Maciej Skierkowski",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "fs-extra": "^9.0.1",
+    "lodash": "^4.17.19",
+    "yamljs": "^0.3.0"
+  }
+}
