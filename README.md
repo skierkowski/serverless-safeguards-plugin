@@ -1,9 +1,9 @@
 # Safeguards
 
-*Safeguards* is a policy-as-code framework for Serverless Framework which enables you to inspect your `serverless.yml` file, and the generated Cloud Formation templates, for compliance with security, operational, and organizational, best practices. Safeguards are made available as a stand-alone Serverless Framework plugin with no external dependencies. 
+**Safeguards** is a policy-as-code framework for Serverless Framework which enables you to inspect your `serverless.yml` file, and the generated Cloud Formation templates, for compliance with security, operational, and organizational, best practices. Safeguards are made available as a stand-alone Serverless Framework plugin with no external dependencies. 
 
 
-**Highlights**
+### Highlights
 - **Stand-alone** - it has no external dependencies on any services.
 - **Extensible** - While the plugin comes with over a dozen policies out of the box, you can define new Safeguards and add them to your repo.
 - **Configurable** - Safeguards are implemented to accept configuration as input so you can customize the policies for each safeguard.
@@ -432,9 +432,9 @@ add it to the list of policies.
 ```yaml
 custom:
   safeguards:
-    location: ./policies
-    policies:
-      - stage-in-table-name
+    - title: Require stage name in table name
+      safeguard: stage-in-table-name
+      path: ./policies
 ```
 
 ### Adding settings to your policy
@@ -457,9 +457,10 @@ module.exports = function myCustomPolicy(policy, service, options) {
 ```yaml
 custom:
   safeguards:
-    location: ./policies
-    policies:
-      - my-custom-policy:
-          max: 2
+    - title: my custom policy
+      safeguard: my-custom-policy
+      path: ./policies
+      config:
+        max: 2
 ```
 
