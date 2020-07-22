@@ -10,6 +10,13 @@
 - **Proactive** - Safeguards are evaluated _before_ any infrastructure is provisioned by evaluating the generated cloud formation template and serverless.yml. 
 - **Environment-specific** - Policies can be associated with stages you can enforce different policies on development environments and production environments.
 
+## Docs
+- [Installation](#installation)
+- [Migration from Serverless Framework Pro](#migration-from-serverless-framework-pro)
+- [Defining policies](#defining-policies)
+- [Usage](#usage)
+- [Example](#example)
+
 ## Installation
 To install **automatically** run this single command:
 
@@ -40,7 +47,7 @@ In Serverless Framework Pro, the safeguards are added to deployment profiles. Ea
 3. Set the `stage` field of each policy in `serverless.yml` to match the stage names used in the app. For example, if you had a policy `allowed-regions` in the deployment profile and it was associated with the `prod` stage, then add the field `stage: prod` to the policy in the `serverless.yml`.
 4. In SF Pro you have the ability to define stages (e.g. `prod`, `qa`) or use the `default` stage. The default stage is used to enforce safeguard policies from the deployment profile on any stages that don't match the other defined stages. For example, if you have `prod` and `qa` defined, but you deploy to `feature-x`, then the policies associated with the `default` stage will be used. For these policies, do not set the `stage` field, which will cause those policies to be enforced on all stages. At the moment, there isn't a way to define a blacklist for the stages.
 
-## Configuring Policies
+## Defining Policies
 
 Safeguard policies are defined as an array in the `serverless.yml` in the `custom.safeguards` field. You can add multiple policies, and you can use the same safeguard multiple times. 
 
@@ -128,6 +135,41 @@ occurring. A warning will display a message but the deploy will continue.
 If one or more of the policy checks fail the command will return a 1 exit code so
 it can be detected from a script or CI/CD service.
 
+## Example
+
+```yaml
+service: aws-node-rest-api
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+
+functions:
+  hello:
+    handler: handler.hello
+
+plugins:
+  - serverless-safeguards-plugin
+
+custom:
+  safeguards:
+    - title: No secrets in lambda ENV VARs
+      safeguard: no-secret-env-vars
+
+    - title: Restrict regions
+      safeguard: allowed-regions
+      description: Only deployments in US regions are allowed
+      enforcementLevel: error # if this policy fails, then BLOCK the deployment
+      config: # this configures the allowed-regions safeguard
+        - us-east-1
+        - us-east-2
+        - us-west-1
+        - us-west-2
+      stage: # this policy will only be enforced if you deploy to prod or qa
+        - prod
+        - qa
+```
 
 # Safeguards available with plugin
 
