@@ -16,6 +16,8 @@
 - [Usage](#usage)
 - [Example](#example)
 - [Migrating from Serverless Framework Pro](#migrating-from-serverless-framework-pro)
+- [Available Safeguards](#safeguards-available-with-plugin)
+- [Custom policies](#custom-policies)
 
 ## Installation
 To install **automatically** run this single command:
