@@ -15,7 +15,7 @@ async function runPolicies(ctx) {
   const stage = ctx.provider.options.stage
 
   /**
-   * Loads all the policy configurations from the custom.safeguards.policies
+   * Loads all the policy configurations from the custom.safeguards
    * object from serverless.yml
    */
   const policyConfigs = get(ctx.sls.service, 'custom.safeguards', []).map((policy) => {

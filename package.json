@@ -6,10 +6,19 @@
   "repository": "https://github.com/skierkowski/serverless-safeguards",
   "author": "Maciej Skierkowski",
   "license": "MIT",
+  "scripts": {
+    "test": "mocha \"!(node_modules)**/*.test.js\""
+  },
   "dependencies": {
     "chalk": "^4.1.0",
     "fs-extra": "^9.0.1",
     "lodash": "^4.17.19",
     "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.0.1",
+    "proxyquire": "^2.1.3",
+    "sinon": "^9.0.2"
   }
 }

@@ -4,6 +4,7 @@ const proxyquire = require('proxyquire');
 const sinon = require('sinon');
 const { cloneDeep } = require('lodash');
 const chalk = require('chalk');
+const { expect } = require('chai');
 
 let getSafeguardsResolution;
 const getSafeguards = async () => getSafeguardsResolution;
@@ -70,7 +71,7 @@ describe('safeguards', () => {
 
     it('loads a safeguard from outside the plugin', async () => {
       expect(
-        typeof loadPolicy('../../examples/safeguards-example-service/policies', 'no-wild-cors')
+        typeof loadPolicy('../examples/policies', 'no-wild-cors')
       ).to.equal('function');
     });
   });
@@ -87,6 +88,9 @@ describe('safeguards', () => {
       },
       provider: {
         naming: {},
+        options: {
+          stage: 'dev'
+        }
       },
       state: {},
       safeguards: [],
@@ -107,21 +111,19 @@ describe('safeguards', () => {
 
     it('loads & runs 2 safeguards when specified by remote config', async () => {
       const ctx = cloneDeep(defualtCtx);
-      ctx.safeguards = [
+      ctx.sls.service.custom.safeguards = [
         {
           title: 'Require Dead Letter Queues',
-          safeguardName: 'require-dlq',
-          policyUid: 'asdfasfdasf',
+          safeguard: 'require-dlq',
           enforcementLevel: 'error',
-          safeguardConfig: null,
+          config: null,
           description: 'You gotta use a DLQ!',
         },
         {
           title: 'no wild iam',
-          safeguardName: 'no-wild-iam-role-statements',
-          policyUid: 'asdfasfdasabdaslfhsaf',
+          safeguard: 'no-wild-iam-role-statements',
           enforcementLevel: 'error',
-          safeguardConfig: null,
+          config: null,
           describe: 'dude! no wild cards in iam roles!',
         },
       ];
@@ -137,15 +139,15 @@ describe('safeguards', () => {
         [
           `Safeguards Summary: ${chalk.green('2 passed')}, ${chalk.keyword('orange')(
             '0 warnings'
-          )}, ${chalk.red('0 errors')}`,
+          )}, ${chalk.red('0 errors')}, ${chalk.blueBright('0 skipped')}`,
           '\nServerless',
         ],
       ]);
       expect(process.stdout.write.args).to.deep.equal([
         ['  running - Require Dead Letter Queues'],
-        [`\r   ${chalk.green('passed')} - Require Dead Letter Queues\n`],
+        [`\r   ${chalk.green('passed')}  - Require Dead Letter Queues\n`],
         ['  running - no wild iam'],
-        [`\r   ${chalk.green('passed')} - no wild iam\n`],
+        [`\r   ${chalk.green('passed')}  - no wild iam\n`],
       ]);
       expect(requireDlq.callCount).to.equal(1);
       expect(iamPolicy.callCount).to.equal(1);
@@ -153,13 +155,12 @@ describe('safeguards', () => {
 
     it('loads & runs 1 warning safeguards at enforcementLevel=warning when specified by remote config', async () => {
       const ctx = cloneDeep(defualtCtx);
-      ctx.safeguards = [
+      ctx.sls.service.custom.safeguards = [
         {
           title: 'no secrets',
-          safeguardName: 'no-secret-env-vars',
-          policyUid: 'nos-secrest-policy-id',
+          safeguard: 'no-secret-env-vars',
           enforcementLevel: 'warning',
-          safeguardConfig: null,
+          config: null,
           description: 'wtf yo? no secrets!',
         },
       ];
@@ -175,13 +176,13 @@ describe('safeguards', () => {
         [
           `Safeguards Summary: ${chalk.green('0 passed')}, ${chalk.keyword('orange')(
             '1 warnings'
-          )}, ${chalk.red('0 errors')}`,
+          )}, ${chalk.red('0 errors')}, ${chalk.blueBright('0 skipped')}`,
           '\nServerless',
         ],
       ]);
       expect(process.stdout.write.args).to.deep.equal([
         ['  running - no secrets'],
-        [`\r   ${chalk.keyword('orange')('warned')} - no secrets\n`],
+        [`\r   ${chalk.keyword('orange')('warned')}  - no secrets\n`],
         [
           `\n   ${chalk.yellow('Details --------------------------------------------------')}
 
