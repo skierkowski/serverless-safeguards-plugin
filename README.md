@@ -1,32 +1,80 @@
 # Safeguards
 
-*Safeguards* is a policy-as-code framework for Serverless Framework which enables you to inspect your `serverless.yml` file, and the generated Cloud Formation templates, for compliance with security, operational, and organizational, best practices. Safeguards are made available as a stand-alone Serverless Framework plugin with no external dependencies. 
+**Safeguards** is a policy-as-code framework for Serverless Framework which enables you to inspect your `serverless.yml` file, and the generated Cloud Formation templates, for compliance with security, operational, and organizational, best practices. Safeguards are made available as a stand-alone Serverless Framework plugin with no external dependencies. 
 
 
-**Highlights**
+### Highlights
 - **Stand-alone** - it has no external dependencies on any services.
 - **Extensible** - While the plugin comes with over a dozen policies out of the box, you can define new Safeguards and add them to your repo.
 - **Configurable** - Safeguards are implemented to accept configuration as input so you can customize the policies for each safeguard.
 - **Proactive** - Safeguards are evaluated _before_ any infrastructure is provisioned by evaluating the generated cloud formation template and serverless.yml. 
+- **Environment-specific** - Policies can be associated with stages you can enforce different policies on development environments and production environments.
 
+## Docs
+- [Installation](#installation)
+- [Defining policies](#defining-policies)
+- [Usage](#usage)
+- [Example](#example)
+- [Migrating from Serverless Framework Pro](#migrating-from-serverless-framework-pro)
+- [Available Safeguards](#safeguards-available-with-plugin)
+- [Custom policies](#custom-policies)
 
-## Getting Started
+## Installation
+To install **automatically** run this single command:
 
-Coming Soon
+```
+serverless plugin install --name serverless-safeguards-plugin
+```
 
-## Migrating from Serverless Framework Pro
+To install **manually**, run this command,
 
-Coming Soon
+`npm i serverless-safeguards-plugin --save-dev`
 
-## Configuring Policies
+and add this to your `serverless.yml`:
 
-- `title` (optional) - This is a user-readable name for the Safeguard policy. When the policy check is run in the CLI, the Safeguard policy name is used in the output.
-- `description` (optional) - The description should explain the intent of the policy. When the Safeguard policy check runs in the CLI this description will be displayed if the policy check fails. It is recommended that the description provides instructions on how to resolve an issue if the service is not compliant with the policy.
-- `safeguard` (requried) - Select the Safeguard you want to enforce.
-- `enforcementLevel` (optional, default: `error`) - The enforcement level can be set to either `warning` or `error`. When the Safeguard policy check runs in the CLI and the policy check passes, then enforcement level will have no impact on the deployment. However, if the policy check fails, then the enforcement level will control if the deployment can continue. If the enforcement level is set to `warning`, then the CLI will return a warning message but the deployment will continue. If the enforcement level is set to `error`, then the CLI will return an error message and the deployment will be blocked from continuing.
-- `config` - Some safeguards may allow or require configurations. For example, the [Allowed Runtimes (allowed-runtimes)](#allowed-runtimes) Safeguard requires a list of allowed AWS Lambda Runtimes for functions. This field allows you to customize the settings for the Safeguard policy.
-- `path` (optional) - If using a custom policy, this references the relative path to the safeguard base directory. 
+```yaml
+plugins:
+  - serverless-safeguards-plugin
+```
 
+## Defining Policies
+
+Safeguard policies are defined as an array in the `serverless.yml` in the `custom.safeguards` field. You can add multiple policies, and you can use the same safeguard multiple times. 
+
+```yaml
+custom:
+  safeguards:
+    - safeguard:
+      title:
+      description:
+      enforcementLevel:
+      config:
+      stage:
+```
+
+### Fields
+
+#### `title` (optional)
+
+This is a user-readable name for the Safeguard policy. When the policy check is run in the CLI, the Safeguard policy name is used in the output.
+
+#### `description` (optional)
+The description should explain the intent of the policy. When the Safeguard policy check runs in the CLI this description will be displayed if the policy check fails. It is recommended that the description provides instructions on how to resolve an issue if the service is not compliant with the policy.
+
+#### `safeguard` (required)
+The Safeguard ID. There are [over a dozen safeguards made availabe with the plugin](#safeguards-available-with-plugin). Each plugin has an `ID` (e.g. `allowed-runtimes`) which is used to reference in the policy. 
+
+#### `enforcementLevel` (optional, default: `error`)
+The enforcement level can be set to either `warning` or `error`. When the Safeguard policy check runs in the CLI and the policy check passes, then enforcement level will have no impact on the deployment. However, if the policy check fails, then the enforcement level will control if the deployment can continue. If the enforcement level is set to `warning`, then the CLI will return a warning message but the deployment will continue. If the enforcement level is set to `error`, then the CLI will return an error message and the deployment will be blocked from continuing.
+
+#### `config`
+Some safeguards may allow or require configurations. For example, the [Allowed Runtimes (allowed-runtimes)](#allowed-runtimes) Safeguard requires a list of allowed AWS Lambda Runtimes for functions. This field allows you to customize the settings for the Safeguard policy.
+
+#### `path` (optional)
+If using a custom policy, this references the relative path to the safeguard base directory.
+
+#### `stage` (optional)
+By default a policy will run on all deployments, regardless of stage. However, if you want to scope the policy to only certain stages (e.g. `prod`), you can enforce the policy only on the selected stages. The stage field accepts string, or an array of strings, and if the current stage matches any of those, then the policy will be enforced.
 
 ## Usage
 
@@ -77,8 +125,56 @@ occurring. A warning will display a message but the deploy will continue.
 If one or more of the policy checks fail the command will return a 1 exit code so
 it can be detected from a script or CI/CD service.
 
+## Example
 
-# Policies
+```yaml
+service: aws-node-rest-api
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+
+functions:
+  hello:
+    handler: handler.hello
+
+plugins:
+  - serverless-safeguards-plugin
+
+custom:
+  safeguards:
+    - title: No secrets in lambda ENV VARs
+      safeguard: no-secret-env-vars
+
+    - title: Restrict regions
+      safeguard: allowed-regions
+      description: Only deployments in US regions are allowed
+      enforcementLevel: error # if this policy fails, then BLOCK the deployment
+      config: # this configures the allowed-regions safeguard
+        - us-east-1
+        - us-east-2
+        - us-west-1
+        - us-west-2
+      stage: # this policy will only be enforced if you deploy to prod or qa
+        - prod
+        - qa
+```
+
+
+## Migrating from Serverless Framework Pro
+
+Serverless Framework Pro also supports safeguards which you can configure in the dashboard. However, this is being deprecated from Serverless Framework Pro, so instead, you can use this plugin to enforce the same policies.
+
+In Serverless Framework Pro, the safeguards are added to deployment profiles. Each deployment profile then can be associated with an individual stage in an app. It can also be assocaited with the _default_ stage in the app. In the serverless-safeguards-plugin, policies are added to individual services and can be configured for a subset of stages.
+
+### Migration steps:
+1. Install the `serverless-safeguard-plugin` to every project which used the Serverless Framework Pro safeguards.
+2. For each policy defined in the SF Pro dashboard, copy the configuration (name, description, enforcement level, config), into the `custom.safeguards` of your `serverless.yml`. The fields from the Safeguard Policies in the SF Pro dashboard match 1-1 with the fields in the serverless-safeguards-plugin, so it should be as easy as copy-pasting.
+3. Set the `stage` field of each policy in `serverless.yml` to match the stage names used in the app. For example, if you had a policy `allowed-regions` in the deployment profile and it was associated with the `prod` stage, then add the field `stage: prod` to the policy in the `serverless.yml`.
+4. In SF Pro you have the ability to define stages (e.g. `prod`, `qa`) or use the `default` stage. The default stage is used to enforce safeguard policies from the deployment profile on any stages that don't match the other defined stages. For example, if you have `prod` and `qa` defined, but you deploy to `feature-x`, then the policies associated with the `default` stage will be used. For these policies, do not set the `stage` field, which will cause those policies to be enforced on all stages. At the moment, there isn't a way to define a blacklist for the stages.
+
+# Safeguards available with plugin
 
 The following policies are included and configurable in the [Serverless
 Framework Dashboard](https://app.serverless.com/).
@@ -432,9 +528,9 @@ add it to the list of policies.
 ```yaml
 custom:
   safeguards:
-    location: ./policies
-    policies:
-      - stage-in-table-name
+    - title: Require stage name in table name
+      safeguard: stage-in-table-name
+      path: ./policies
 ```
 
 ### Adding settings to your policy
@@ -457,9 +553,10 @@ module.exports = function myCustomPolicy(policy, service, options) {
 ```yaml
 custom:
   safeguards:
-    location: ./policies
-    policies:
-      - my-custom-policy:
-          max: 2
+    - title: my custom policy
+      safeguard: my-custom-policy
+      path: ./policies
+      config:
+        max: 2
 ```
 
