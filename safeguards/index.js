@@ -12,6 +12,7 @@ const loadPolicy = (policyPath, safeguardName) =>
 
 async function runPolicies(ctx) {
   const basePath = ctx.sls.config.servicePath;
+  const stage = ctx.provider.options.stage
 
   /**
    * Loads all the policy configurations from the custom.safeguards.policies
@@ -24,6 +25,7 @@ async function runPolicies(ctx) {
       enforcementLevel: policy.enforcementLevel || 'error',
       title: policy.title || `Policy: ${safeguardName}`,
       description: policy.description,
+      stage: policy.stage,
     }
 
     if(policy.path){
@@ -90,11 +92,12 @@ async function runPolicies(ctx) {
     const result = {
       approved: false,
       failed: false,
+      skipped: false,
       policy,
     };
     const approve = () => {
       result.approved = true;
-      process.stdout.write(`\r   ${chalk.green('passed')} - ${policy.title}\n`);
+      process.stdout.write(`\r   ${chalk.green('passed')}  - ${policy.title}\n`);
     };
     const fail = (message) => {
       if (result.failed) {
@@ -102,19 +105,35 @@ async function runPolicies(ctx) {
       } else {
         const errorWord = policy.enforcementLevel === 'error' ? 'failed' : 'warned';
         const color = policy.enforcementLevel === 'error' ? chalk.red : chalk.keyword('orange');
-        process.stdout.write(`\r   ${color(errorWord)} - ${policy.title}\n`);
+        process.stdout.write(`\r   ${color(errorWord)}  - ${policy.title}\n`);
         result.failed = true;
         result.message = message;
       }
     };
     const policyHandle = { approve, fail };
 
-    await policy.function(policyHandle, service, policy.safeguardConfig);
-    if (!result.approved && !result.failed) {
-      ctx.sls.cli.log(
-        `Safeguard Policy "${policy.title}" finished running, but did not explicitly approve the deployment. This is likely a problem in the policy itself. If this problem persists, contact the policy author.`
-      );
+    let stageApplies = true
+    if(policy.stage){
+      if(typeof policy.stage === "string"){
+        stageApplies = policy.stage === stage
+      }
+      if(typeof policy.stage === "object" && Array.isArray(policy.stage)) {
+        stageApplies = policy.stage.includes(stage)
+      }
     }
+
+    if (!stageApplies){
+      result.skipped = true;
+      process.stdout.write(`\r   ${chalk.blueBright('skipped')} - ${policy.title}\n`);
+    } else {
+      await policy.function(policyHandle, service, policy.safeguardConfig);
+      if (!result.approved && !result.failed) {
+        ctx.sls.cli.log(
+          `Safeguard Policy "${policy.title}" finished running, but did not explicitly approve the deployment. This is likely a problem in the policy itself. If this problem persists, contact the policy author.`
+        );
+      }
+    }
+
     return result;
   });
 
@@ -123,10 +142,11 @@ async function runPolicies(ctx) {
 
   const failed = markedPolicies.filter((res) => res.policy.enforcementLevel === 'error').length;
   const warned = markedPolicies.filter((res) => res.policy.enforcementLevel !== 'error').length;
+  const skipped = ctx.state.safeguardsResults.filter((res) => res.skipped).length;
   const passed = ctx.state.safeguardsResults.filter((res) => res.approved && !res.failed).length;
   const summary = `Safeguards Summary: ${chalk.green(`${passed} passed`)}, ${chalk.keyword(
     'orange'
-  )(`${warned} warnings`)}, ${chalk.red(`${failed} errors`)}`;
+  )(`${warned} warnings`)}, ${chalk.red(`${failed} errors`)}, ${chalk.blueBright(`${skipped} skipped`)}`;
 
   if (markedPolicies.length !== 0) {
     const resolveMessage = (res) => {
