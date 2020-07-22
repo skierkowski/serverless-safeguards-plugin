@@ -10,9 +10,23 @@
 - **Proactive** - Safeguards are evaluated _before_ any infrastructure is provisioned by evaluating the generated cloud formation template and serverless.yml. 
 
 
-## Getting Started
+## Installation
+To install **automatically** run this single command:
 
-Coming Soon
+```
+serverless plugin install --name serverless-safeguards-plugin
+```
+
+To install **manually**, run this command,
+
+`npm i serverless-safeguards-plugin --save-dev`
+
+and add this to your `serverless.yml`:
+
+```yaml
+plugins:
+  - serverless-safeguards-plugin
+```
 
 ## Migrating from Serverless Framework Pro
 
