@@ -171,7 +171,7 @@ custom:
 
 ## Migrating from Serverless Framework Pro
 
-Serverless Framework Pro also supports safeguards which you can configure in the dashboard. However, this is being deprecated from Serverless Framework Pro, so instead, you can use this plugin to enforce the same policies.
+Serverless Framework Pro also supported safeguards which you can configure in the dashboard; however, this feature has been open source and repackaged in this plugin. Here is how you can migrate your existing configuration in SF Pro to use the serverless-safeguards-plugin instead.
 
 In Serverless Framework Pro, the safeguards are added to deployment profiles. Each deployment profile then can be associated with an individual stage in an app. It can also be assocaited with the _default_ stage in the app. In the serverless-safeguards-plugin, policies are added to individual services and can be configured for a subset of stages.
 
