@@ -12,7 +12,7 @@ const loadPolicy = (policyPath, safeguardName) =>
 
 async function runPolicies(ctx) {
   const basePath = ctx.sls.config.servicePath;
-  const stage = ctx.provider.options.stage
+  const stage = ctx.provider.options.stage;
 
   /**
    * Loads all the policy configurations from the custom.safeguards
@@ -26,9 +26,9 @@ async function runPolicies(ctx) {
       title: policy.title || `Policy: ${safeguardName}`,
       description: policy.description,
       stage: policy.stage,
-    }
+    };
 
-    if(policy.path){
+    if (policy.path) {
       let localPoliciesPath = path.relative(__dirname, path.resolve(basePath, policy.path));
       if (!localPoliciesPath.startsWith('.')) {
         localPoliciesPath = `.${path.sep}${localPoliciesPath}`;
@@ -36,7 +36,7 @@ async function runPolicies(ctx) {
       policyConfig.policyPath = localPoliciesPath;
     }
 
-    return policyConfig
+    return policyConfig;
   });
 
   if (policyConfigs.length === 0) {
@@ -112,17 +112,17 @@ async function runPolicies(ctx) {
     };
     const policyHandle = { approve, fail };
 
-    let stageApplies = true
-    if(policy.stage){
-      if(typeof policy.stage === "string"){
-        stageApplies = policy.stage === stage
+    let stageApplies = true;
+    if (policy.stage) {
+      if (typeof policy.stage === 'string') {
+        stageApplies = policy.stage === stage;
       }
-      if(typeof policy.stage === "object" && Array.isArray(policy.stage)) {
-        stageApplies = policy.stage.includes(stage)
+      if (typeof policy.stage === 'object' && Array.isArray(policy.stage)) {
+        stageApplies = policy.stage.includes(stage);
       }
     }
 
-    if (!stageApplies){
+    if (!stageApplies) {
       result.skipped = true;
       process.stdout.write(`\r   ${chalk.blueBright('skipped')} - ${policy.title}\n`);
     } else {
@@ -146,7 +146,9 @@ async function runPolicies(ctx) {
   const passed = ctx.state.safeguardsResults.filter((res) => res.approved && !res.failed).length;
   const summary = `Safeguards Summary: ${chalk.green(`${passed} passed`)}, ${chalk.keyword(
     'orange'
-  )(`${warned} warnings`)}, ${chalk.red(`${failed} errors`)}, ${chalk.blueBright(`${skipped} skipped`)}`;
+  )(`${warned} warnings`)}, ${chalk.red(`${failed} errors`)}, ${chalk.blueBright(
+    `${skipped} skipped`
+  )}`;
 
   if (markedPolicies.length !== 0) {
     const resolveMessage = (res) => {

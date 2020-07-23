@@ -70,9 +70,7 @@ describe('safeguards', () => {
     });
 
     it('loads a safeguard from outside the plugin', async () => {
-      expect(
-        typeof loadPolicy('../examples/policies', 'no-wild-cors')
-      ).to.equal('function');
+      expect(typeof loadPolicy('../examples/policies', 'no-wild-cors')).to.equal('function');
     });
   });
 
@@ -89,8 +87,8 @@ describe('safeguards', () => {
       provider: {
         naming: {},
         options: {
-          stage: 'dev'
-        }
+          stage: 'dev',
+        },
       },
       state: {},
       safeguards: [],
