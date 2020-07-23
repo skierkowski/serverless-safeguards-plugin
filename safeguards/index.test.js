@@ -198,13 +198,12 @@ describe('safeguards', () => {
 
     it('loads & runs 1 error safeguards at enforcementLevel=error when specified by remote config', async () => {
       const ctx = cloneDeep(defualtCtx);
-      ctx.safeguards = [
+      ctx.sls.service.custom.safeguards = [
         {
           title: 'no secrets',
-          safeguardName: 'no-secret-env-vars',
-          policyUid: 'nos-secrest-policy-id',
+          safeguard: 'no-secret-env-vars',
           enforcementLevel: 'error',
-          safeguardConfig: null,
+          config: null,
           description: 'wtf yo? no secrets!',
         },
       ];
@@ -225,13 +224,13 @@ describe('safeguards', () => {
         [
           `Safeguards Summary: ${chalk.green('0 passed')}, ${chalk.keyword('orange')(
             '0 warnings'
-          )}, ${chalk.red('1 errors')}`,
+          )}, ${chalk.red('1 errors')}, ${chalk.blueBright('0 skipped')}`,
           '\nServerless',
         ],
       ]);
       expect(process.stdout.write.args).to.deep.equal([
         ['  running - no secrets'],
-        [`\r   ${chalk.red('failed')} - no secrets\n`],
+        [`\r   ${chalk.red('failed')}  - no secrets\n`],
         [
           `\n   ${chalk.yellow('Details --------------------------------------------------')}
 
