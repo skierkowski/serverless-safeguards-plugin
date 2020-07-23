@@ -7,6 +7,7 @@
   "author": "",
   "license": "Apache-2.0",
   "scripts": {
+    "build": "./scripts/build.sh",
     "test": "mocha \"!(node_modules)/**/*.test.js\"",
     "lint": "eslint .",
     "lint:staged": "lint-staged",
@@ -27,6 +28,10 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/register": "^7.10.5",
     "@serverless/eslint-config": "^2.1.1",
     "chai": "^4.2.0",
     "eslint": "^7.5.0",
