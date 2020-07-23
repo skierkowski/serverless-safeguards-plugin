@@ -1,10 +1,10 @@
 {
-  "name": "serverless-safeguards",
+  "name": "@serverless/safeguards-plugin",
   "version": "1.0.0",
   "description": "Serverless Framework Plugin for Safeguards",
   "main": "index.js",
-  "repository": "https://github.com/skierkowski/serverless-safeguards",
-  "author": "Maciej Skierkowski",
+  "repository": "https://github.com/serverless/safeguards-plugin",
+  "author": "",
   "license": "Apache-2.0",
   "scripts": {
     "test": "mocha \"!(node_modules)/**/*.test.js\"",
