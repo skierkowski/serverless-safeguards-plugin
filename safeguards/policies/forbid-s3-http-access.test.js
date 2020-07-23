@@ -1,6 +1,8 @@
 'use strict';
 
 const sinon = require('sinon');
+const { expect } = require('chai');
+
 const forbidS3HttpAccessPolicy = require('./forbid-s3-http-access');
 
 describe('forbidS3HttpAccessPolicy', () => {

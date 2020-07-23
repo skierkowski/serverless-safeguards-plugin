@@ -1,6 +1,8 @@
 'use strict';
 
 const sinon = require('sinon');
+const { expect } = require('chai');
+
 const forbidLambdaApigIntegration = require('./forbid-lambda-apig-integration');
 
 describe('fobidLambdaIntegrationPolicy', () => {

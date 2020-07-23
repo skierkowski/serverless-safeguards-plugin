@@ -1,6 +1,8 @@
 'use strict';
 
 const sinon = require('sinon');
+const { expect } = require('chai');
+
 const allowedFunctionNamesPolicy = require('./allowed-function-names');
 
 describe('allowedFunctionNamesPolicy', () => {

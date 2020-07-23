@@ -1,6 +1,8 @@
 'use strict';
 
 const sinon = require('sinon');
+const { expect } = require('chai');
+
 const noWildIamPolicy = require('./no-wild-iam-role-statements');
 
 describe('noWildIamPolicy', () => {

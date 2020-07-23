@@ -7,7 +7,7 @@
   "author": "Maciej Skierkowski",
   "license": "MIT",
   "scripts": {
-    "test": "mocha \"!(node_modules)**/*.test.js\""
+    "test": "mocha \"!(node_modules)/**/*.test.js\""
   },
   "dependencies": {
     "chalk": "^4.1.0",

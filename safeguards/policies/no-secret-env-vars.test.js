@@ -1,6 +1,8 @@
 'use strict';
 
 const sinon = require('sinon');
+const { expect } = require('chai');
+
 const noSecretEnvVarsPolicy = require('./no-secret-env-vars');
 
 describe('noSecretEnvVarsPolicy', () => {
